@@ -43,8 +43,8 @@ namespace HungryDogs.Logic.Controllers.Persistence
         {
             entity.CheckArgument(nameof(entity));
 
-            await Set.AddAsync(ConvertTo(entity)).ConfigureAwait(false);
-            return entity;
+            var result = await Set.AddAsync(ConvertTo(entity)).ConfigureAwait(false);
+            return result.Entity;
         }
         public async Task<TContract> UpdateAsync(TContract entity)
         {
@@ -74,6 +74,7 @@ namespace HungryDogs.Logic.Controllers.Persistence
             contract.CheckArgument(nameof(contract));
 
             entity.Id = contract.Id;
+            entity.RestaurantId = entity.RestaurantId;
             entity.From = contract.From;
             entity.To = contract.To;
             entity.Notes = contract.Notes;

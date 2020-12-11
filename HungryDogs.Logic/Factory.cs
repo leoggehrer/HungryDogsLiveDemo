@@ -30,5 +30,14 @@ namespace HungryDogs.Logic
         {
             return new Controllers.Persistence.SpecialOpeningHourController(controller as Controllers.ControllerObject);
         }
+
+        public static Contracts.Client.IController<Contracts.Business.ICustomerRestaurant> CreateCustomerRestaurant()
+        {
+            return new Controllers.Business.CustomerRestaurantController();
+        }
+        public static Contracts.Client.IController<Contracts.Business.ICustomerRestaurant> CreateCustomerRestaurant(Object controller)
+        {
+            return new Controllers.Business.CustomerRestaurantController(controller as Controllers.ControllerObject);
+        }
     }
 }

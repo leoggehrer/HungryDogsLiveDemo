@@ -12,5 +12,5 @@ namespace HungryDogs.Logic.Entities.Persistence
         public SpecialOpenState State { get; set; }
         // Navigation
         public Restaurant Restaurant { get; set; }
-    }
+	}
 }

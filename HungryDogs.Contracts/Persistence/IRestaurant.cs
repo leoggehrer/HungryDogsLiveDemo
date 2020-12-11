@@ -2,12 +2,7 @@
 
 namespace HungryDogs.Contracts.Persistence
 {
-    public interface IRestaurant : IVersionable
+    public interface IRestaurant : IVersionable, ICommonRestaurant
     {
-        string Name { get; set; }
-        string OwnerName { get; set; }
-        string UniqueName { get; set; }
-        string Email { get; set; }
-        RestaurantState State { get; set; }
     }
 }

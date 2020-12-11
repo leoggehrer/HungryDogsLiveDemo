@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HungryDogs.Logic.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    [Migration("20201204084217_InitDb")]
+    [Migration("20201211094732_InitDb")]
     partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace HungryDogs.Contracts.Client
 {
-    public interface IController<T>
+    public interface IController<T> : IDisposable
     {
         Task<int> Count();
         Task<T> CreateAsync();
