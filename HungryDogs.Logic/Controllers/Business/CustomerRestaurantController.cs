@@ -2,8 +2,6 @@
 using HungryDogs.Logic.DataContext;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using TContract = HungryDogs.Contracts.Business.ICustomerRestaurant;
 using TEntity = HungryDogs.Logic.Entities.Business.CustomerRestaurant;
@@ -25,14 +23,19 @@ namespace HungryDogs.Logic.Controllers.Business
 
         internal async Task<TEntity> LoadCustomerRestaurantAsync(int id)
 		{
-			var qry = await Set.Include(e => e.OpeningHours)
-							   .ThenInclude(e => e.Restaurant.SepcialOpeningHours)
-							   .SingleOrDefaultAsync(e => e.Id == id)
-							   .ConfigureAwait(false);
+            var result = default(TEntity);
+			var qryResult = await Set.Include(e => e.OpeningHours)
+							         .Include(e => e.SepcialOpeningHours)
+							         .SingleOrDefaultAsync(e => e.Id == id)
+							         .ConfigureAwait(false);
 
+            if (qryResult != null)
+			{
+                result = new TEntity();
 
-
-			return null;
+                
+			}
+            return result;
 		}
 
         public Task<int> Count()
