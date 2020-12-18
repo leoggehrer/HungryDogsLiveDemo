@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace HungryDogs.Logic.Time
 {
-    static class TimeTable
+	static class TimeTable
     {
         public static IEnumerable<FromToTime> LoadTimeTable(Entities.Persistence.Restaurant restaurant, DateTime dateTime)
         {
@@ -14,20 +14,33 @@ namespace HungryDogs.Logic.Time
 
             var result = new List<FromToTime>();
 
-            if (restaurant.OpeningHours != null)
-            {
-                foreach (var item in restaurant.OpeningHours.Where(e => e.Weekday == (int)dateTime.DayOfWeek))
-                {
-                    result.Add(new FromToTime(item.OpenFrom, item.OpenTo));
-                }
-            }
             if (restaurant.SepcialOpeningHours != null)
             {
-                foreach (var item in restaurant.SepcialOpeningHours.Where(e => (e.From == null && e.To == null)
-                                                                            || (e.From == null && dateTime.ToDateSecondStamp() <= e.To.Value.ToDateSecondStamp())
-                                                                            || (e.From.Value.ToDateSecondStamp() >= dateTime.ToDateSecondStamp() && e.To == null)))
+                var query = restaurant.SepcialOpeningHours.Where(e => (e.From == null && e.To == null)
+                                                                   || (e.From == null && dateTime.ToDateSecondStamp() <= e.To.Value.ToDateSecondStamp())
+                                                                   || (e.From.Value.ToDateSecondStamp() <= dateTime.ToDateSecondStamp() && e.To == null)
+                                                                   || (e.From.Value.ToDateSecondStamp() <= dateTime.ToDateSecondStamp() && dateTime.ToDateSecondStamp() <= e.To.Value.ToDateSecondStamp()))
+                                                          .Select(e => new FromToTime(e.From, e.To, e.State))
+                                                          .OrderBy(e => e.From);
+                var closedPermanent = query.FirstOrDefault(e => e.State == SpecialOpenState.ClosedPermanent);
+                
+                if (closedPermanent != null)
                 {
-                    result.Add(new FromToTime(item.From, item.To, item.State));
+                    result.Add(closedPermanent);
+                }
+                else
+                {
+                    foreach (var item in query)
+                    {
+                        result.Add(new FromToTime(item.From, item.To, item.State));
+                    }
+                    if (restaurant.OpeningHours != null)
+                    {
+                        foreach (var item in restaurant.OpeningHours.Where(e => e.Weekday == (int)dateTime.DayOfWeek))
+                        {
+                            result.Add(new FromToTime(item.OpenFrom, item.OpenTo));
+                        }
+                    }
                 }
             }
             return CleanUp(result);
@@ -100,14 +113,25 @@ namespace HungryDogs.Logic.Time
             }
             return result;
         }
-        public static IEnumerable<FromToTime> Insert(IEnumerable<FromToTime> timeTable, FromToTime fromToTime)
+        public static FromToTime Create(IEnumerable<FromToTime> timeTable, DateTime from, DateTime to, SpecialOpenState openState)
         {
             timeTable.CheckArgument(nameof(timeTable));
-            fromToTime.CheckArgument(nameof(fromToTime));
 
+            var result = default(FromToTime);
             var timeList = new List<FromToTime>(timeTable);
+            var index = timeList.FindIndex(e => e.IsBetween(from) && e.State != openState);
 
-            return timeList;
+            if (index > -1)
+            {
+                var entry = timeList[index];
+
+                result = new FromToTime(now, entry.To, openState);
+            }
+            else
+            {
+                result = new FromToTime(now, new DateTime(now.Year, now.Month, now.Day, 23, 59, 59), openState);
+            }
+            return result;
         }
     }
 }
